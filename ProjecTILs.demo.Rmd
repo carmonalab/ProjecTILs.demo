@@ -72,6 +72,8 @@ querydata3 <- read.sc.query(fname3, type = "raw.log2")
 query.projected <- make.projection(querydata, ref=ref)
 ```
 
+NB: by default, `make.projection()` will pre-filter T cells using [scGate](https://github.com/carmonalab/scgate). In case the input dataset is already pre-filtered, or if you are using a non-T cell reference atlas, you can disable this step using `make.projection(querydata, ref=ref, filter.cells = FALSE)`.
+
 Plot projection of new data over the reference in UMAP space. The contour lines display the density of projected query cells onto the reference map.
 ```{r warning=FALSE,message=FALSE}
 plot.projection(ref, query.projected)
@@ -183,7 +185,7 @@ ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
 
 ProjecTILs case studies - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
 
-Publication: [pre-print](https://doi.org/10.1101/2020.06.23.166546)
+Publication: [Andreatta et al Nat. Comm. 2021](http://dx.doi.org/10.1038/s41467-021-23324-4)
 
 
 

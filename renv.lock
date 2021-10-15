@@ -98,18 +98,6 @@
       "Repository": "CRAN",
       "Hash": "df57c82e79600601287edfdcef92c2d6"
     },
-    "ProjecTILs": {
-      "Package": "ProjecTILs",
-      "Version": "2.0.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "ProjecTILs",
-      "RemoteUsername": "carmonalab",
-      "RemoteRef": "dev",
-      "RemoteSha": "6c249b6a36cf2c7db61ce0fb75c22452bb476983",
-      "Hash": "319da36394ca748a6ad5d2dfe072616c"
-    },
     "R6": {
       "Package": "R6",
       "Version": "2.5.1",
@@ -207,18 +195,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "e5959242d66cfe4de9116fdcec327f80"
-    },
-    "UCell": {
-      "Package": "UCell",
-      "Version": "1.1.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "UCell",
-      "RemoteUsername": "carmonalab",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "76b8a4ead8b2a02b0af36943752d1e1efc98dce3",
-      "Hash": "2b830bd152a5fd524403c27c582072d6"
     },
     "abind": {
       "Package": "abind",
@@ -988,18 +964,6 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "50cf822feb64bb3977bda0b7091be623"
-    },
-    "scGate": {
-      "Package": "scGate",
-      "Version": "1.0.0",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "scGate",
-      "RemoteUsername": "carmonalab",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "73047f454e4e0e699fd744d7541afad3811ff24e",
-      "Hash": "526bc65f64073e1fe2c97aba37348265"
     },
     "scales": {
       "Package": "scales",
