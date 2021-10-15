@@ -1,0 +1,192 @@
+---
+title: Projecting scRNAseq data onto a reference map of Tumour-Infiltrating Lymphocytes
+author: 
+- Massimo Andreatta^[massimo.andreatta@unil.ch]
+- Santiago Carmona^[santiago.carmona@unil.ch]
+date: "09/04/2021"
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file,
+ encoding=encoding,
+ output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
+#output: html_notebook
+---
+
+
+First, check package dependencies and install ProjecTILs
+```{r message=F, warning=F}
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+
+if (!requireNamespace("renv")) 
+  install.packages("renv")
+library(renv)
+renv::restore()
+
+remotes::install_github("carmonalab/ProjecTILs")
+
+library(ProjecTILs)
+```
+
+### Load reference atlas and query data
+
+First, load the default reference TIL atlas.
+If no reference map file is provided, the function `load.reference.map()` will automatically download it from  [https://doi.org/10.6084/m9.figshare.12478571](https://doi.org/10.6084/m9.figshare.12478571)
+```{r}
+ref <- load.reference.map()
+```
+
+Let's explore the reference atlas
+```{r}
+refCols <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000", "#87f6a5", "#e812dd")
+DimPlot(ref,label = T, cols = refCols)
+```
+
+See expression of important marker genes across reference subtypes
+```{r}
+markers <- c("Cd4","Cd8a","Ccr7","Tcf7","Pdcd1","Havcr2","Tox","Izumo1r","Cxcr6","Xcl1","Gzmb","Gzmk","Ifng","Foxp3")
+VlnPlot(ref,features=markers,stack = T,flip = T,assay = "RNA")
+```
+
+
+Now let's load a query dataset - [Miller et al., Nature Immunol (2019)](https://pubmed.ncbi.nlm.nih.gov/30778252/)
+```{r warning=FALSE}
+#A sample data set is provided with the ProjecTILs package
+querydata <- ProjecTILs::query_example_seurat
+```
+
+More generally, it is possible to load a query matrix with gene names and barcodes (e.g. 10X format or raw counts)
+```{r warning=FALSE,message=FALSE,results=FALSE}
+##10X format
+fname2 <- "./sample_data"
+querydata2 <- read.sc.query(fname2, type="10x")
+
+##Raw count matrix from GEO
+library(GEOquery)
+geo_acc <- "GSE86028"
+getGEOSuppFiles(geo_acc)
+
+fname3 <- sprintf("%s/GSE86028_TILs_sc_wt_mtko.tpm.log2.txt.gz", geo_acc)
+querydata3 <- read.sc.query(fname3, type = "raw.log2")
+```
+
+### Run Projection algorithm
+```{r warning=FALSE,message=FALSE}
+query.projected <- make.projection(querydata, ref=ref)
+```
+
+Plot projection of new data over the reference in UMAP space. The contour lines display the density of projected query cells onto the reference map.
+```{r warning=FALSE,message=FALSE}
+plot.projection(ref, query.projected)
+```
+
+### Predict cell states
+
+Predict the cell states in the query set using a nearest-neighbor algorithm
+```{r warning=FALSE,message=FALSE}
+query.projected <- cellstate.predict(ref=ref, query=query.projected)
+table(query.projected$functional.cluster)
+```
+
+Plot the predicted composition of the query in terms of reference T cell subtypes
+```{r warning=FALSE,message=FALSE}
+plot.statepred.composition(ref, query.projected,metric = "Percent")
+```
+
+How do the gene expression levels compare between reference and query for the different cell states?
+```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
+plot.states.radar(ref, query=query.projected, min.cells=20)
+```
+
+### Compare states across conditions
+
+If we have multiple conditions (e.g. control vs. treatment, or samples from different tissues), we can search for discriminant genes between conditions (otherwise, by default this analysis is performed against the reference subtype as the 'control')
+```{r fig.height=8, fig.width=12}
+#Simulate a condition which e.g. increases Gzmb expression compared to control
+query.control <- subset(query.projected, subset=`Gzmb` < 1.5)
+query.perturb <- subset(query.projected, subset=`Gzmb` >= 1.5)
+
+plot.states.radar(ref, query=list("Control" = query.control, "Query" = query.perturb))
+```
+
+In this toy example, where we simulated a condition that increases Gzmb expression compared to control, we expect cytotoxicity genes to drive differences.
+```{r warning=FALSE,message=FALSE}
+discriminantGenes <- find.discriminant.genes(ref=ref, query=query.perturb, query.control=query.control, state="CD8_Tex")
+head(discriminantGenes,n=10)
+```
+
+
+We can use a volcano plot to display differentially expressed genes:
+```{r}
+library(EnhancedVolcano)
+EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
+    FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Gzmb_high vs. Gzmb_low (Tex)")
+```
+
+Using a random subsetting, p-values should not be significant:
+```{r warning=FALSE,message=FALSE}
+rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
+discriminantGenes <- find.discriminant.genes(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], state="CD8_Tex")
+EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
+    FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Random split (Tex)")
+```
+
+
+### Find discriminant dimensions
+
+The dimensions in UMAP space summarize the main axes of variability of the reference map. What if the query data contains novel states? We can search for additional, maximally discriminant dimensions (either in ICA or PCA space) that explain new variability in the query set.
+
+As before, simulate a condition which increases Gzmb expression compared to control
+```{r fig.height=8, fig.width=12}
+#
+query.control <- subset(query.projected, subset=`Gzmb` < 1.5)
+query.perturb <- subset(query.projected, subset=`Gzmb` >= 1.5)
+
+plot.states.radar(ref, query=list("Control" = query.control, "Query" = query.perturb))
+```
+
+In this toy example, we expect some gene module associated with granzymes to drive the discriminant analysis:
+```{r warning=FALSE,message=FALSE}
+top.ica.wcontrol <- find.discriminant.dimensions(ref=ref, query=query.perturb, query.control=query.control)
+```
+
+```{r}
+head(top.ica.wcontrol)
+VizDimLoadings(ref, reduction = "ica", nfeatures = 10, dims=c(26,24,42), ncol=3)
+```
+
+Now we can plot the ICA dimension that captured the genetic changes associated to the perturbation of increasing Gzmb
+```{r warning=FALSE,message=FALSE}
+plot3d <- plot.discriminant.3d(ref, query=query.perturb, query.control=query.control, extra.dim="ICA_26")
+plot3d
+```
+
+We can plot other metadata in the z-axis of the UMAP, e.g. the cycling score calculated by the TILPRED cycling signature 
+```{r warning=FALSE,message=FALSE}
+plot3d <- plot.discriminant.3d(ref, query.projected, extra.dim="cycling.score")
+plot3d
+```
+
+Focus the plot only on a specific state
+```{r warning=FALSE,message=FALSE}
+plot3d <- plot.discriminant.3d(ref, query.projected, extra.dim="cycling.score", query.state="CD8_Tex")
+plot3d
+```
+
+Using a random subsetting, p-values should not be significant:
+```{r warning=FALSE,message=FALSE}
+rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
+top.ica.ks.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], reduction="ica")
+top.ica.ttest.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], reduction="ica", test = "t-test")
+```
+
+# Further information
+
+ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
+
+ProjecTILs case studies - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
+
+Publication: [pre-print](https://doi.org/10.1101/2020.06.23.166546)
+
+
+
+

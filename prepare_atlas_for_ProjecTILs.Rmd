@@ -1,0 +1,210 @@
+---
+title: Building a custom reference atlas for ProjecTILs
+date: "`r Sys.Date()`"
+author: "M. Andreatta and S. Carmona"
+output:
+  rmdformats::readthedown:
+    self-contained: true
+    highlight: haddock
+    thumbnails: false
+    css: styles.css
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file, encoding=encoding,
+  output_file=file.path(dirname(input_file), out_dir, 'build_ref_atlas.html'))})
+---
+
+ProjecTILs comes with a number of pre-calculated reference atlases (see [TIL atlas](https://doi.org/10.6084/m9.figshare.12478571) and [viral infection atlas](https://doi.org/10.6084/m9.figshare.12489518)). However, you may want to use your own **custom atlas** as a reference for dataset projection. This vignette will walk you through the steps required to convert your custom single-cell map into a reference atlas for ProjecTILs. 
+
+We are going to use a custom T cell reference described in [this paper](https://academic.oup.com/bioinformatics/advance-article/doi/10.1093/bioinformatics/btaa755/5897412), and constructed with the following code: [STACAS tutorial](https://carmonalab.github.io/STACAS/tutorial.html). 
+
+You can **download the integrated map as a Seurat object** from: [stacas.cd4cd8.integrated.rds](https://drive.switch.ch/index.php/s/YkF4hLssiZcM6EX)
+
+**Note 1:**  For speed and simplicity, here we are using a downsampled version of the original data.
+
+**Note 2:**  This is an illustrative example for object conversion and is not meant to be a robust reference atlas of T cell transcriptomics states.
+
+```{r setup, echo=FALSE}
+#install.packages("rmdformats")
+#Template markdown setup
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               cache.lazy=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE,
+               dev='png')
+opts_knit$set(width=75)
+
+```
+
+
+```{r echo=F, message=F, warning=F, results=F, cache=F}
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+
+if (!requireNamespace("renv")) 
+  install.packages("renv")
+library(renv)
+renv::restore()
+```
+
+# Read in single-cell data
+
+After loading the required packages, read the single-cell data into memory.
+
+```{r message=F, warning=F, results=F}
+library(ggplot2)
+library(Seurat)
+```
+
+```{r}
+data.seurat <- readRDS("stacas.cd4cd8.integrated.rds")
+```
+
+Check structure of this object:
+```{r}
+data.seurat
+DimPlot(data.seurat, reduction = "umap", group.by = "Study") + ggtitle("UMAP by sample")
+```
+
+If you apply the following procedure to your own data, just make sure that you have a complete Seurat object with PCA and UMAP embeddings. We assume here that data have been integrated for batch correction (therefore the *integrated* assay); you may have to adapt the code accordingly if that is not the case for your custom atlas.
+
+# Prepare atlas for ProjecTILs
+
+To be able to use the custom atlas as a reference in ProjecTILs, we need to recalculate PCA and UMAP embeddings externally of Seurat, using respectively the [prcomp](https://stat.ethz.ch/R-manual/R-patched/library/stats/html/prcomp.html) and [umap](https://cran.r-project.org/web/packages/umap/vignettes/umap.html) packages. This is because the **umap** package implements a neat function (*predict*) that allows projection of new data into a pre-computed UMAP space.
+
+1) Re-compute PCA embeddings using **prcomp**
+```{r}
+
+set.seed(1234)
+which.assay="integrated"
+
+varfeat <- data.seurat@assays[[which.assay]]@var.features
+  
+refdata <- data.frame(t(data.seurat@assays[[which.assay]]@data[varfeat,]))
+refdata <- refdata[, sort(colnames(refdata))]
+  
+ref.pca <- prcomp(refdata, rank. = 50, scale. = TRUE, center = TRUE, retx=TRUE)
+
+ref.pca$rotation[1:5,1:5]
+```
+
+2) Re-compute UMAP embeddings using **umap**
+```{r fig.height=2, fig.width=2}
+library(umap)
+
+seed=1234
+n.neighbors=30
+min.dist=0.3
+metric="cosine"
+ndim=10
+
+umap.config <- umap.defaults
+umap.config$n_neighbors = n.neighbors
+umap.config$min_dist = min.dist
+umap.config$metric = metric
+umap.config$n_components = 2
+umap.config$random_state = seed
+umap.config$transform_state = seed
+
+ref.umap <- umap(ref.pca$x[,1:ndim], config=umap.config)
+
+colnames(ref.umap$layout) <- c("UMAP_1","UMAP_2")
+ref.umap
+```
+
+
+3) Overwrite Seurat UMAP configuration with the one calculated externally
+```{r}
+data.seurat@reductions$umap@cell.embeddings <- ref.umap$layout
+data.seurat@reductions$pca@cell.embeddings <- ref.pca$x
+data.seurat@reductions$pca@feature.loadings <- ref.pca$rotation
+colnames(data.seurat@reductions$pca@cell.embeddings) <- gsub("PC(\\d+)", "PC_\\1", colnames(ref.pca$x), perl=TRUE)
+colnames(data.seurat@reductions$pca@feature.loadings) <- gsub("PC(\\d+)", "PC_\\1", colnames(ref.pca$rotation), perl=TRUE)
+#Store the complete PCA and UMAP object in @misc
+data.seurat@misc$pca_object <- ref.pca
+data.seurat@misc$umap_object <- ref.umap
+data.seurat@misc$projecTILs="custom_atlas"
+```
+
+See the new data embedding
+```{r}
+DimPlot(data.seurat, reduction = "umap", pt.size = 0.5, group.by = "Study") + ggtitle("UMAP by sample")
+```
+
+To use the integrated data as a reference atlas, we may want to annotate clusters of cells that form cell subtypes/states. First we perform unsupervised clustering:
+```{r}
+set.seed(1234)
+
+ndim=10
+resol=0.7
+
+#1) Find neighbors from PCA reduction
+DefaultAssay(data.seurat) <- "integrated"
+data.seurat <- FindNeighbors(data.seurat, reduction = "pca", dims = 1:ndim, k.param = 30)
+
+#2) Find the clusters
+data.seurat  <- FindClusters(data.seurat, resolution = resol)
+
+data.seurat@meta.data$cluster <- factor(data.seurat@meta.data[[sprintf("%s_snn_res.%s",which.assay,resol)]])
+
+DimPlot(data.seurat, reduction="umap", label = TRUE, group.by = "cluster")
+```
+
+
+There are many types of analysis that can be applied to annotate cell clusters (e.g. differential expression analysis, expression of known markers, signature analysis, etc.) and it is beyond the scope of this toy example to do a thorough cluster annotation. 
+
+Regardless of the type of analysis performed, clusters or groups of clusters that reflect biologically meaningful properties of the cells can be assigned a label. In ProjecTILs we use the "functional.cluster" metadata field to store this cluster annotation for reference atlases.
+```{r}
+f.clusters <- rep("Unknown", dim(data.seurat)[2])
+names(f.clusters) <- colnames(data.seurat)
+
+f.clusters[data.seurat$cluster %in% c(0)] = "Treg"
+f.clusters[data.seurat$cluster %in% c(2)] = "CD8_Exhausted"
+f.clusters[data.seurat$cluster %in% c(6,7)] = "CD8_PrecExhausted"
+f.clusters[data.seurat$cluster %in% c(3,9)] = "CD4_Tfh"
+f.clusters[data.seurat$cluster %in% c(5,8)] = "CD4_Th1"
+f.clusters[data.seurat$cluster %in% c(4)] = "CD8_EM"
+f.clusters[data.seurat$cluster %in% c(1)] = "CD8_NaiveLike"
+
+data.seurat <- AddMetaData(data.seurat, as.factor(f.clusters), col.name = "functional.cluster")
+
+table(f.clusters)
+
+DimPlot(data.seurat, reduction="umap", label = TRUE, group.by = "functional.cluster")
+```
+
+```{r fig.height=9}
+Idents(data.seurat) <- "functional.cluster"
+genes.show <- c("Cd4","Cd8b1","Foxp3","Pdcd1","Ccr7","Havcr2","Xcl1","Tox","Gzmk")
+VlnPlot(data.seurat, features=genes.show, pt.size = 0, assay="RNA", ncol=3)
+```
+
+Save your custom atlas to disk.
+```{r}
+saveRDS(data.seurat, file="my.custom.atlas.rds")
+```
+
+Now the atlas is ready for use as a ProjecTILs reference. Load the custom reference atlas from any script and start projecting new data!
+```{r}
+library(ProjecTILs)
+ref <- load.reference.map(ref="my.custom.atlas.rds")
+```
+
+# Conclusion
+
+In summary, the essential steps needed to convert your custom atlas as a reference for ProjecTILs are:
+
+* **Recalculating the PCA and UMAP embeddings** of your Seurat object, and store them in the appropriate slots.
+* Populating the **"functional.cluster"** metadata field with your **reference** cell state annotations.
+
+ProjecTILs GitHub page - [Repository](https://github.com/carmonalab/ProjecTILs)
+
+ProjecTILs case studies - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
