@@ -1,6 +1,6 @@
 ---
 title: Projecting scRNA-seq data onto a reference map of tumour-infiltrating lymphocytes (TILs)
-date: "09/04/2021"
+date: "15/10/2021"
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
   rmarkdown::render(input_file, encoding=encoding, output_file=file.path(dirname(input_file), out_dir, 'tutorial.html'))})
@@ -21,7 +21,9 @@ This demo will walk you through a complete dataset projection and analysis using
 
 First, install ProjecTILs. For detailed installation instructions refer to the [ProjecTILs Github page](https://github.com/carmonalab/ProjecTILs)
 ```{r warning=FALSE,message=FALSE,results=FALSE}
-remotes::install_github("carmonalab/ProjecTILs")
+remotes::install_github("carmonalab/UCell")
+remotes::install_github("carmonalab/scGate")
+remotes::install_github("carmonalab/ProjecTILs", ref='dev')
 library(ProjecTILs)
 ```
 
@@ -53,10 +55,6 @@ querydata <- ProjecTILs::query_example_seurat
 
 More generally, it is possible to load a query matrix with gene names and barcodes (e.g. 10X format or raw counts)
 ```{r warning=FALSE,message=FALSE,results=FALSE}
-##10X format
-fname2 <- "./sample_data"
-querydata2 <- read.sc.query(fname2, type="10x")
-
 ##Raw count matrix from GEO
 library(GEOquery)
 geo_acc <- "GSE86028"
@@ -91,7 +89,7 @@ plot.statepred.composition(ref, query.projected,metric = "Percent")
 
 How do the gene expression levels compare between reference and query for the different cell states?
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
-plot.states.radar(ref, query=query.projected, min.cells = 20)
+plot.states.radar(ref, query=query.projected, min.cells = 30)
 ```
 
 ### Compare states across conditions
@@ -107,23 +105,32 @@ plot.states.radar(ref, query=list("Control" = query.control, "Query" = query.per
 
 In this toy example, where we simulated a condition that increases Gzmb expression compared to control, we expect cytotoxicity genes to drive differences.
 ```{r warning=FALSE,message=FALSE}
-discriminantGenes <- find.discriminant.genes(ref=ref, query=query.perturb, query.control=query.control, state="CD8_Tex")
+discriminantGenes <- find.discriminant.genes(ref=ref, query=query.perturb,
+                                             query.control=query.control, state="CD8_Tex")
 head(discriminantGenes,n=10)
 ```
 
 We can use a volcano plot to display differentially expressed genes:
 ```{r}
 library(EnhancedVolcano)
-EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
-    FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Gzmb_high vs. Gzmb_low (Tex)")
+EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes),
+                x = "avg_log2FC", y = "p_val",
+                pCutoff = 1e-09, FCcutoff = 0.5, labSize = 5, 
+                legendPosition = "none", drawConnectors = F, 
+                title = "Gzmb_high vs. Gzmb_low (Tex)")
 ```
 
 Using a random subsetting, p-values should not be significant:
 ```{r warning=FALSE,message=FALSE}
 rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
-discriminantGenes <- find.discriminant.genes(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], state="CD8_Tex")
-EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
-    FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Random split (Tex)")
+discriminantGenes <- find.discriminant.genes(ref=ref, query=rand.list[[1]], 
+                                             query.control=rand.list[[2]], state="CD8_Tex")
+
+EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes),
+                x = "avg_log2FC", y = "p_val",
+                pCutoff = 1e-09, FCcutoff = 0.5, labSize = 5,
+                legendPosition = "none", drawConnectors = F,
+                title = "Random split (Tex)")
 ```
 
 
@@ -152,7 +159,8 @@ VizDimLoadings(ref, reduction = "ica", nfeatures = 10, dims=c(26,24,42), ncol=3)
 
 Now we can plot the ICA dimension that captured the genetic changes associated to the perturbation of increasing Gzmb
 ```{r warning=FALSE,message=FALSE}
-plot3d <- plot.discriminant.3d(ref, query=query.perturb, query.control=query.control, extra.dim="ICA_26")
+plot3d <- plot.discriminant.3d(ref, query=query.perturb, 
+                               query.control=query.control, extra.dim="ICA_26")
 plot3d
 ```
 
@@ -171,8 +179,10 @@ plot3d
 Using a random subsetting, p-values should not be significant:
 ```{r warning=FALSE,message=FALSE}
 rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
-top.ica.ks.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], reduction="ica")
-top.ica.ttest.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], reduction="ica", test = "t-test")
+top.ica.ks.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], 
+                                                query.control=rand.list[[2]], reduction="ica")
+top.ica.ttest.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], 
+                                                   query.control=rand.list[[2]], reduction="ica", test = "t-test")
 ```
 
 # Further information

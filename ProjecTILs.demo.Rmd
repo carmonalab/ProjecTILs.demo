@@ -23,11 +23,8 @@ library(renv)
 renv::restore()
 
 remotes::install_github("carmonalab/UCell")
-remotes::install_git("https://gitlab.unil.ch/carmona/scGate.git")
+remotes::install_github("carmonalab/scGate")
 remotes::install_github("carmonalab/ProjecTILs", ref='dev')
-
-#system("R CMD build /Users/mass/Documents/Projects/Github/ProjecTILs")
-#system("R CMD INSTALL ProjecTILs_1.2.0.tar.gz")
 
 library(ProjecTILs)
 ```
@@ -61,10 +58,6 @@ querydata <- ProjecTILs::query_example_seurat
 
 More generally, it is possible to load a query matrix with gene names and barcodes (e.g. 10X format or raw counts)
 ```{r warning=FALSE,message=FALSE,results=FALSE}
-##10X format
-fname2 <- "./sample_data"
-querydata2 <- read.sc.query(fname2, type="10x")
-
 ##Raw count matrix from GEO
 library(GEOquery)
 geo_acc <- "GSE86028"
@@ -99,7 +92,7 @@ plot.statepred.composition(ref, query.projected,metric = "Percent")
 
 How do the gene expression levels compare between reference and query for the different cell states?
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
-plot.states.radar(ref, query=query.projected, min.cells=20)
+plot.states.radar(ref, query=query.projected, min.cells=30)
 ```
 
 ### Compare states across conditions
