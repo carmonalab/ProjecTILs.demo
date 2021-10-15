@@ -12,7 +12,7 @@ git clone --depth 1 https://gitlab.unil.ch/carmona/ProjecTILs.demo.git
 
 Then move to the `ProjecTILs.demo` folder and open `ProjecTILs.demo.Rproj` in RStudio. In this enviroment, you can follow step-by-step the commands outlined in `ProjecTILs.demo.Rmd`
 
-See also a precompiled **html version** of this demo at: [ProjecTILs tutorial](https://carmonalab.github.io/ProjecTILs/tutorial.html)
+See also a precompiled **html version** of this demo at: [ProjecTILs tutorial](https://carmonalab.github.io/ProjecTILs.demo/tutorial.html)
 
 If you have problems with the installation, you may also download a [Docker image](https://hub.docker.com/repository/docker/mandrea1/projectils_demo) of the project with all dependencies pre-installed.
 
