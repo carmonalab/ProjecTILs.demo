@@ -23,7 +23,7 @@ First, install ProjecTILs. For detailed installation instructions refer to the [
 ```{r warning=FALSE,message=FALSE,results=FALSE}
 remotes::install_github("carmonalab/UCell")
 remotes::install_github("carmonalab/scGate")
-remotes::install_github("carmonalab/ProjecTILs", ref='dev')
+remotes::install_github("carmonalab/ProjecTILs")
 library(ProjecTILs)
 ```
 
