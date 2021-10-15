@@ -7,7 +7,7 @@ This demo will walk you through a complete dataset projection and analysis using
 
 Copy this repository to your local system:
 ```
-git clone --depth 1 https://gitlab.unil.ch/carmona/ProjecTILs.demo.git
+git clone --depth 1 https://github.com/carmonalab/ProjecTILs.demo.git
 ```
 
 Then move to the `ProjecTILs.demo` folder and open `ProjecTILs.demo.Rproj` in RStudio. In this enviroment, you can follow step-by-step the commands outlined in `ProjecTILs.demo.Rmd`
