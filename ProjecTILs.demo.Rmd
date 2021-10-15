@@ -22,7 +22,12 @@ if (!requireNamespace("renv"))
 library(renv)
 renv::restore()
 
-remotes::install_github("carmonalab/ProjecTILs")
+remotes::install_github("carmonalab/UCell")
+remotes::install_git("https://gitlab.unil.ch/carmona/scGate.git")
+remotes::install_github("carmonalab/ProjecTILs", ref='dev')
+
+#system("R CMD build /Users/mass/Documents/Projects/Github/ProjecTILs")
+#system("R CMD INSTALL ProjecTILs_1.2.0.tar.gz")
 
 library(ProjecTILs)
 ```
