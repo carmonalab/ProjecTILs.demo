@@ -24,7 +24,7 @@ First, check package dependencies and install ProjecTILs
 ```{r message=F, warning=F}
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
 
-remotes::install_github("carmonalab/UCell", ref="v1.3")
+#remotes::install_github("carmonalab/UCell", ref="v1.3")
 remotes::install_github("carmonalab/scGate")
 remotes::install_github("carmonalab/ProjecTILs")
 
@@ -97,7 +97,7 @@ plot.statepred.composition(ref, query.projected,metric = "Percent")
 
 How do the gene expression levels compare between reference and query for the different cell states?
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
-plot.states.radar(ref, query=query.projected, min.cells=30)
+plot.states.radar(ref, query=query.projected)
 ```
 
 ### Compare states across conditions

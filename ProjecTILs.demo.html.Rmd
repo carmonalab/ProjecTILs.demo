@@ -21,7 +21,6 @@ This demo will walk you through a complete dataset projection and analysis using
 
 First, install ProjecTILs. For detailed installation instructions refer to the [ProjecTILs Github page](https://github.com/carmonalab/ProjecTILs)
 ```{r warning=FALSE,message=FALSE,results=FALSE}
-remotes::install_github("carmonalab/UCell")
 remotes::install_github("carmonalab/scGate")
 remotes::install_github("carmonalab/ProjecTILs")
 library(ProjecTILs)
@@ -89,7 +88,7 @@ plot.statepred.composition(ref, query.projected,metric = "Percent")
 
 How do the gene expression levels compare between reference and query for the different cell states?
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
-plot.states.radar(ref, query=query.projected, min.cells = 30)
+plot.states.radar(ref, query=query.projected)
 ```
 
 ### Compare states across conditions
