@@ -1,30 +1,54 @@
 ---
-title: Projecting scRNAseq data onto a reference map of Tumour-Infiltrating Lymphocytes
-author: 
-- Massimo Andreatta^[massimo.andreatta@unil.ch]
-- Santiago Carmona^[santiago.carmona@unil.ch]
-date: "09/04/2021"
+title: Projecting scRNA-seq data onto a reference map
+date: "`r Sys.Date()`"
+author: "M. Andreatta and S. Carmona"
+output:
+  rmdformats::readthedown:
+    self-contained: true
+    highlight: haddock
+    thumbnails: false
+    css: styles.css
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
-  rmarkdown::render(input_file,
- encoding=encoding,
- output_file=file.path(dirname(input_file), out_dir, 'index.html'))})
-#output: html_notebook
+  rmarkdown::render(input_file, encoding=encoding,
+  output_file=file.path(dirname(input_file), out_dir, 'tutorial.html'))})
 ---
 
-```{r message=F, warning=F, results=F, echo=F}
-if (!requireNamespace("renv")) 
-  install.packages("renv")
-library(renv)
-renv::restore()
+
+```{r setup, echo=FALSE}
+#install.packages("rmdformats")
+#Template markdown setup
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               cache.lazy=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE,
+               dev='png')
+opts_knit$set(width=75)
+
 ```
+
+# R environment
 
 First, check package dependencies and install ProjecTILs
 
 ```{r message=F, warning=F}
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+options(timeout = max(300, getOption("timeout")))
 
-#remotes::install_github("carmonalab/UCell", ref="v1.3")
+if (!requireNamespace("renv")) 
+  install.packages("renv")
+library(renv)
+renv::restore()
+
 remotes::install_github("carmonalab/scGate")
 remotes::install_github("carmonalab/ProjecTILs")
 
@@ -32,7 +56,7 @@ library(ProjecTILs)
 library(Seurat)
 ```
 
-### Load reference atlas and query data
+# Load reference atlas and query data
 
 First, load the default reference TIL atlas.
 If no reference map file is provided, the function `load.reference.map()` will automatically download it from  [https://doi.org/10.6084/m9.figshare.12478571](https://doi.org/10.6084/m9.figshare.12478571)
@@ -41,13 +65,13 @@ ref <- load.reference.map()
 ```
 
 Let's explore the reference atlas
-```{r}
+```{r fig.height=4, fig.width=6}
 refCols <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", "#00B6EB", "#d1cfcc", "#FF0000", "#87f6a5", "#e812dd")
 DimPlot(ref,label = T, cols = refCols)
 ```
 
 See expression of important marker genes across reference subtypes
-```{r}
+```{r fig.height=5, fig.width=7}
 markers <- c("Cd4","Cd8a","Ccr7","Tcf7","Pdcd1","Havcr2","Tox","Izumo1r","Cxcr6","Xcl1","Gzmb","Gzmk","Ifng","Foxp3")
 VlnPlot(ref,features=markers,stack = T,flip = T,assay = "RNA")
 ```
@@ -66,32 +90,28 @@ library(GEOquery)
 geo_acc <- "GSE86028"
 getGEOSuppFiles(geo_acc)
 
-fname3 <- sprintf("%s/GSE86028_TILs_sc_wt_mtko.tpm.log2.txt.gz", geo_acc)
-querydata3 <- read.sc.query(fname3, type = "raw.log2")
+fname2 <- sprintf("%s/GSE86028_TILs_sc_wt_mtko.tpm.log2.txt.gz", geo_acc)
+querydata2 <- read.sc.query(fname2, type = "raw.log2")
 ```
 
-### Run Projection algorithm
+# Run Projection algorithm
+
 ```{r warning=FALSE,message=FALSE}
-query.projected <- make.projection(querydata, ref=ref)
+query.projected <- Run.ProjecTILs(querydata, ref=ref)
 ```
 
-NB: by default, `make.projection()` will pre-filter T cells using [scGate](https://github.com/carmonalab/scgate). In case the input dataset is already pre-filtered, or if you are using a non-T cell reference atlas, you can disable this step using `make.projection(querydata, ref=ref, filter.cells = FALSE)`.
+
+**NB:** by default, `Run.ProjecTILs()` will pre-filter T cells using [scGate](https://github.com/carmonalab/scgate). In case the input dataset is already pre-filtered, you can disable this step using `Run.ProjecTILs(querydata, ref=ref, filter.cells = FALSE)`. If you are using a custom reference map that is not composed of T cells, you may specify a different scGate filter using the `scGate_model` parameter.
+
+# Visualize projection
 
 Plot projection of new data over the reference in UMAP space. The contour lines display the density of projected query cells onto the reference map.
-```{r warning=FALSE,message=FALSE}
-plot.projection(ref, query.projected)
-```
-
-### Predict cell states
-
-Predict the cell states in the query set using a nearest-neighbor algorithm
-```{r warning=FALSE,message=FALSE}
-query.projected <- cellstate.predict(ref=ref, query=query.projected)
-table(query.projected$functional.cluster)
+```{r fig.height=4, fig.width=6}
+plot.projection(ref, query.projected, linesize = 0.5, pointsize = 0.5)
 ```
 
 Plot the predicted composition of the query in terms of reference T cell subtypes
-```{r warning=FALSE,message=FALSE}
+```{r fig.height=3, fig.width=5}
 plot.statepred.composition(ref, query.projected,metric = "Percent")
 ```
 
@@ -100,9 +120,10 @@ How do the gene expression levels compare between reference and query for the di
 plot.states.radar(ref, query=query.projected)
 ```
 
-### Compare states across conditions
+# Compare cell states across conditions
 
-If we have multiple conditions (e.g. control vs. treatment, or samples from different tissues), we can search for discriminant genes between conditions (otherwise, by default this analysis is performed against the reference subtype as the 'control')
+If we have multiple conditions (e.g. control vs. treatment, or samples from different tissues), we can search for discriminant genes between conditions (otherwise, by default this analysis is performed using the reference as the 'control')
+
 ```{r fig.height=8, fig.width=12}
 #Simulate a condition which e.g. increases Gzmb expression compared to control
 query.control <- subset(query.projected, subset=`Gzmb` < 1.5)
@@ -117,79 +138,52 @@ discriminantGenes <- find.discriminant.genes(ref=ref, query=query.perturb, query
 head(discriminantGenes,n=10)
 ```
 
-
 We can use a volcano plot to display differentially expressed genes:
-```{r}
+```{r fig.height=6, fig.width=6}
 library(EnhancedVolcano)
 EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
     FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Gzmb_high vs. Gzmb_low (Tex)")
 ```
 
 Using a random subsetting, p-values should not be significant:
-```{r warning=FALSE,message=FALSE}
+```{r fig.height=6, fig.width=6}
 rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
 discriminantGenes <- find.discriminant.genes(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], state="CD8_Tex")
 EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
     FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Random split (Tex)")
 ```
 
+# Using ProjecTILs as a classifier
 
-### Find discriminant dimensions
+If you do not wish to embed your query data into the reference space, you may also simply use ProjecTILs as a cell type classifier. This may be useful to annotate cell types in your query without altering existing embeddings.
 
-The dimensions in UMAP space summarize the main axes of variability of the reference map. What if the query data contains novel states? We can search for additional, maximally discriminant dimensions (either in ICA or PCA space) that explain new variability in the query set.
+See the query dataset in unsupervised low-dim embeddings:
+```{r fig.height=3, fig.width=6}
+querydata <- querydata |> FindVariableFeatures(nfeatures=500) |>
+  ScaleData() |> RunPCA(npcs=10) |> RunUMAP(dims=1:10)
 
-As before, simulate a condition which increases Gzmb expression compared to control
-```{r fig.height=8, fig.width=12}
-#
-query.control <- subset(query.projected, subset=`Gzmb` < 1.5)
-query.perturb <- subset(query.projected, subset=`Gzmb` >= 1.5)
-
-plot.states.radar(ref, query=list("Control" = query.control, "Query" = query.perturb))
+DimPlot(querydata)
 ```
 
-In this toy example, we expect some gene module associated with granzymes to drive the discriminant analysis:
-```{r warning=FALSE,message=FALSE}
-top.ica.wcontrol <- find.discriminant.dimensions(ref=ref, query=query.perturb, query.control=query.control)
+The `ProjecTILs.classifier` function applies reference-projection but does not alter the current embeddings.
+
+```{r fig.height=3, fig.width=6}
+querydata <- ProjecTILs.classifier(query=querydata, ref=ref)
+DimPlot(querydata, group.by="functional.cluster")
 ```
 
-```{r}
-head(top.ica.wcontrol)
-VizDimLoadings(ref, reduction = "ica", nfeatures = 10, dims=c(26,24,42), ncol=3)
-```
+We can confirm that most of the cells were classified as CD8_Tex. Please note that filtered cells (i.e. those that were removed by the scGate filter) are assigned the NA label, as they cannot be confidently projected into the reference.
 
-Now we can plot the ICA dimension that captured the genetic changes associated to the perturbation of increasing Gzmb
-```{r warning=FALSE,message=FALSE}
-plot3d <- plot.discriminant.3d(ref, query=query.perturb, query.control=query.control, extra.dim="ICA_26")
-plot3d
-```
 
-We can plot other metadata in the z-axis of the UMAP, e.g. the cycling score calculated by the TILPRED cycling signature 
-```{r warning=FALSE,message=FALSE}
-plot3d <- plot.discriminant.3d(ref, query.projected, extra.dim="cycling.score")
-plot3d
-```
+# Further reading
 
-Focus the plot only on a specific state
-```{r warning=FALSE,message=FALSE}
-plot3d <- plot.discriminant.3d(ref, query.projected, extra.dim="cycling.score", query.state="CD8_Tex")
-plot3d
-```
+For applications of ProjecTILs to gain biological insight on several public datasets please see the **ProjecTILs case studies** - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
 
-Using a random subsetting, p-values should not be significant:
-```{r warning=FALSE,message=FALSE}
-rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
-top.ica.ks.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], reduction="ica")
-top.ica.ttest.rand <- find.discriminant.dimensions(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], reduction="ica", test = "t-test")
-```
-
-# Further information
-
-ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
-
-ProjecTILs case studies - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
+To generate your own reference map for ProjecTILs see [Custom reference map tutorial](https://carmonalab.github.io/ProjecTILs.demo/build_ref_atlas.html)
 
 Publication: [Andreatta et al Nat. Comm. 2021](http://dx.doi.org/10.1038/s41467-021-23324-4)
 
+ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
 
 
 
