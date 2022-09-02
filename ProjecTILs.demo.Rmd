@@ -14,7 +14,6 @@ knit: (function(input_file, encoding) {
   output_file=file.path(dirname(input_file), out_dir, 'tutorial.html'))})
 ---
 
-
 ```{r setup, echo=FALSE}
 #install.packages("rmdformats")
 #Template markdown setup
@@ -35,6 +34,9 @@ opts_chunk$set(echo=TRUE,
 opts_knit$set(width=75)
 
 ```
+
+
+**ProjecTILs** is a computational method to project scRNA-seq data into reference single-cell atlases, enabling their direct comparison in a stable, annotated system of coordinates. This tutorial outlines the main functions implemented in ProjecTILs on a small, simple dataset. For more advanced (and more biologically interesting) applications of ProjecTILs see this list of [ProjecTILs case studies](https://carmonalab.github.io/ProjecTILs_CaseStudies/)
 
 # R environment
 
@@ -96,6 +98,8 @@ querydata2 <- read.sc.query(fname2, type = "raw.log2")
 
 # Run Projection algorithm
 
+The main function in ProjecTILs is `Run.ProjecTILs`, which takes as input a reference map and query dataset. The query will be batch-corrected and projected into the reference map, with low-dimensional embeddings (PCA and UMAP) compatible with those of the reference.
+
 ```{r warning=FALSE,message=FALSE}
 query.projected <- Run.ProjecTILs(querydata, ref=ref)
 ```
@@ -139,14 +143,14 @@ head(discriminantGenes,n=10)
 ```
 
 We can use a volcano plot to display differentially expressed genes:
-```{r fig.height=6, fig.width=6}
+```{r fig.height=5, fig.width=6}
 library(EnhancedVolcano)
 EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
     FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Gzmb_high vs. Gzmb_low (Tex)")
 ```
 
 Using a random subsetting, p-values should not be significant:
-```{r fig.height=6, fig.width=6}
+```{r fig.height=5, fig.width=6}
 rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
 discriminantGenes <- find.discriminant.genes(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], state="CD8_Tex")
 EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
@@ -158,7 +162,7 @@ EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_l
 If you do not wish to embed your query data into the reference space, you may also simply use ProjecTILs as a cell type classifier. This may be useful to annotate cell types in your query without altering existing embeddings.
 
 See the query dataset in unsupervised low-dim embeddings:
-```{r fig.height=3, fig.width=6}
+```{r fig.height=3.5, fig.width=7}
 querydata <- querydata |> FindVariableFeatures(nfeatures=500) |>
   ScaleData() |> RunPCA(npcs=10) |> RunUMAP(dims=1:10)
 
@@ -167,7 +171,7 @@ DimPlot(querydata)
 
 The `ProjecTILs.classifier` function applies reference-projection but does not alter the current embeddings.
 
-```{r fig.height=3, fig.width=6}
+```{r fig.height=3.5, fig.width=7}
 querydata <- ProjecTILs.classifier(query=querydata, ref=ref)
 DimPlot(querydata, group.by="functional.cluster")
 ```
