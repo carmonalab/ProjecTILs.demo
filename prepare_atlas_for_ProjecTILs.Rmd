@@ -190,7 +190,7 @@ Several additional metadata can be added to the reference to improve its capabil
 
 ## Custom color palette
 
-You may store a custom color palette with the atlas, so that all ProjecTILs plotting functions will return a consistent color scheme. Simply store this information in the `ref`@misc$atlas.palette` slot.
+You may store a custom color palette with the atlas, so that all ProjecTILs plotting functions will return a consistent color scheme. Simply store this information in the `ref@misc$atlas.palette` slot.
 
 ```{r}
 library(RColorBrewer)

@@ -173,7 +173,11 @@ The `ProjecTILs.classifier` function applies reference-projection but does not a
 
 ```{r fig.height=3.5, fig.width=7}
 querydata <- ProjecTILs.classifier(query=querydata, ref=ref)
-DimPlot(querydata, group.by="functional.cluster")
+
+palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", 
+                "#00B6EB", "#d1cfcc", "#FF0000", "#87f6a5", "#e812dd")
+names(palette) <- levels(ref$functional.cluster)
+DimPlot(querydata, group.by="functional.cluster", cols = palette)
 ```
 
 We can confirm that most of the cells were classified as CD8_Tex. Please note that filtered cells (i.e. those that were removed by the scGate filter) are assigned the NA label, as they cannot be confidently projected into the reference.

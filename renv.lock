@@ -243,8 +243,8 @@
       "RemoteRepo": "ProjecTILs",
       "RemoteUsername": "carmonalab",
       "RemoteRef": "HEAD",
-      "RemoteSha": "d6fbebc2cdea29e300f1dcad0c8cb00629fa5c9b",
-      "Hash": "09f54e110f84f55d136147c00be918f5",
+      "RemoteSha": "d2a1800e2b4a3f055b66471cdbc65b6ef12a2f18",
+      "Hash": "559bf12c3dd78d323c20180f2ead5db7",
       "Requirements": [
         "BiocParallel",
         "Matrix",

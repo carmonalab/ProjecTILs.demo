@@ -7,7 +7,7 @@
 
         <meta name="author" content="M. Andreatta" />
     
-        <meta name="date" content="2022-09-02" />
+        <meta name="date" content="2022-09-06" />
     
     <title>Building a custom reference atlas for ProjecTILs</title>
 
@@ -1688,7 +1688,7 @@ ProjecTILs</a></h2>
     <div id="postamble" data-toggle="wy-nav-shift" class="status">
                   <p class="author"><span class="glyphicon glyphicon-user"></span> M.
 Andreatta</p>
-                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-09-02</p>
+                        <p class="date"><span class="glyphicon glyphicon-calendar"></span> 2022-09-06</p>
           </div>
    </div>
      
@@ -1700,8 +1700,7 @@ Andreatta</p>
 <div id="main">
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>ProjecTILs comes with a number of curated reference atlases (see
-e.g. <a href="https://spica.unil.ch/refs/TIL">TIL atlas</a>, <a href="https://spica.unil.ch/refs/viral-CD8-T">CD8 viral infection
+<p>ProjecTILs comes with a number of curated references (see e.g. <a href="https://spica.unil.ch/refs/TIL">TIL atlas</a>, <a href="https://spica.unil.ch/refs/viral-CD8-T">CD8 viral infection
 atlas</a> or <a href="https://spica.unil.ch/refs/viral-CD4-T">CD4 viral
 infection atlas</a>). However, you may want to use your own
 <strong>custom atlas</strong> as a reference for dataset projection.
@@ -1873,7 +1872,8 @@ its capabilities, as described below.</p>
 <h2>Custom color palette</h2>
 <p>You may store a custom color palette with the atlas, so that all
 ProjecTILs plotting functions will return a consistent color scheme.
-Simply store this information in the <code>ref</code><span class="citation">@misc$atlas.palette</span>` slot.</p>
+Simply store this information in the <code>ref@misc$atlas.palette</code>
+slot.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>subtypes <span class="ot">&lt;-</span> <span class="fu">levels</span>(ref.momac<span class="sc">$</span>functional.cluster)</span>
