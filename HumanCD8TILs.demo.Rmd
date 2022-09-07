@@ -128,7 +128,7 @@ Let's start by plotting proportions between Responders and Non-responders to ICB
 # Splitting the Seurat object by response to ICB (called expansion here)
 query.list <- subset(query.projected, subset = expansion %in% c("E",
     "NE"))
-query.list <- SplitObject(query.projected, split.by = "expansion")
+query.list <- SplitObject(query.list, split.by = "expansion")
 pll <- list()
 pll[[1]] <- plot.projection(ref, cols = refCols, query.list[["E"]]) + ggtitle("Responder")
 pll[[2]] <- plot.statepred.composition(ref, query.list[["E"]], cols = refCols, metric = "Percent") +
@@ -138,6 +138,11 @@ pll[[4]] <- plot.statepred.composition(ref, cols = refCols, query.list[["NE"]], 
     ggtitle("Non-responder") + ylim(0, 60) + theme_bw() + RotatedAxis() + NoLegend()
 grid.arrange(grobs = pll, ncol = 2, nrow = 2, widths = c(1.5, 1))
 ```
+
+We notice a decrease of TEX in responders (ie, T cell expanded patients), which is consistent with the original annotation.
+
+    'Expansion mainly involved CD8+ T cells with pronounced expression of cytotoxic-activity (PRF1, GZMB), immune-cell homing (CXCL13) and exhaustion markers (HAVCR2, LAG3)
+    Conversely, undifferentiated pre-effector/memory T cells (TCF7+, GZMK+) were inversely correlated with T cell expansion.'
 
 We can also check for gene expression changes between conditions.
 
@@ -151,7 +156,7 @@ If you **do not wish to embed your query data into the reference space,** you ma
 
 See the query dataset in unsupervised low-dim embeddings:
 
-```{r fig.height=4, fig.width=4}
+```{r fig.height=4, fig.width=5}
 query <- query |> FindVariableFeatures(nfeatures=500) |>
   ScaleData() |> RunPCA(npcs=10) |> RunUMAP(dims=1:10)
 
@@ -162,19 +167,17 @@ The `ProjecTILs.classifier` function applies reference-projection but does not a
 
 ```{r fig.height=4, fig.width=5}
 query <- ProjecTILs.classifier(query=query, ref=ref, ncores = 4)
-DimPlot(query, group.by="functional.cluster", cols = refCols)
+DimPlot(query, group.by="functional.cluster", cols = refCols, label = T) + NoLegend()
 ```
 
 As compared to mode 1, **this will keep all your cells. They will just be assigned the NA label**, as they cannot be confidently projected into the reference.
 
 # Further reading
 
--   For more reading about the CD8+ T cell atlas construction, see the [human TIL atlas repository](https://github.com/carmonalab/human_TIL_atlas)
+-   🏗️ For more reading about the CD8+ T cell atlas construction, see the [human TIL atlas repository](https://github.com/carmonalab/human_TIL_atlas)
 
--   For applications of ProjecTILs to gain biological insight on several public datasets please see the **ProjecTILs case studies** - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
+-   🧠 For applications of ProjecTILs to gain biological insight on several public datasets please see the **ProjecTILs case studies** - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
 
--   To generate your own reference map for ProjecTILs see [Custom reference map tutorial](https://carmonalab.github.io/ProjecTILs.demo/build_ref_atlas.html)
+-   👉 To generate your own reference map for ProjecTILs see [Custom reference map tutorial](https://carmonalab.github.io/ProjecTILs.demo/build_ref_atlas.html)
 
--   Publication: [Andreatta et al Nat. Comm. 2021](http://dx.doi.org/10.1038/s41467-021-23324-4)
-
--   ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
+-   📖 ProjecTILs publication: [Andreatta et al Nat. Comm. 2021](http://dx.doi.org/10.1038/s41467-021-23324-4) and ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
