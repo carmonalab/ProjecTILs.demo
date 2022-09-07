@@ -205,7 +205,7 @@ names(palette) <- c(levels(ref$functional.cluster), 'NA')
 DimPlot(querydata, group.by="functional.cluster", cols = palette)
 ```
 
-We can confirm that most of the cells were classified as CD8_Tex. Please note that filtered cells (i.e. those that were removed by the scGate filter) are assigned the NA label, as they cannot be confidently projected into the reference.
+We can confirm that most of the cells were classified as CD8_Tex. Please note that filtered cells (i.e. those that were removed by the scGate filter) are assigned the NA label, as they correspond to cell types that are not present in the reference.
 
 
 # Further reading
