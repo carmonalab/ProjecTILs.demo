@@ -1,0 +1,171 @@
+---
+title: Human CD8 TILs projection
+date: "`r Sys.Date()`"
+author: "P. Gueguen, M. Andreatta and S. Carmona"
+output:
+  rmdformats::readthedown:
+    self-contained: true
+    highlight: haddock
+    thumbnails: false
+    css: styles.css
+knit: (function(input_file, encoding) {
+  out_dir <- 'docs';
+  rmarkdown::render(input_file, encoding=encoding,
+  output_file=file.path(dirname(input_file), out_dir, 'Human_CD8TILs_tutorial.html'))})
+---
+
+```{r setup, echo=FALSE}
+#install.packages("rmdformats")
+#Template markdown setup
+library(knitr)
+library(rmdformats)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(echo=TRUE,
+	             cache=TRUE,
+               cache.lazy=FALSE,
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE,
+               dev='png')
+opts_knit$set(width=75)
+```
+
+**ProjecTILs** is a computational method to project scRNA-seq data into reference single-cell atlases, enabling their direct comparison in a stable, annotated system of coordinates. This tutorial outlines the main functions implemented in ProjecTILs on a small, simple dataset. For more advanced (and more biologically interesting) applications of ProjecTILs see this list of [ProjecTILs case studies](https://carmonalab.github.io/ProjecTILs_CaseStudies/)
+
+# R environment
+
+First, check package dependencies and install ProjecTILs
+
+```{r message=F, warning=F}
+Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
+options(timeout = max(300, getOption("timeout")))
+
+if (!requireNamespace("renv")) 
+  install.packages("renv")
+library(renv)
+renv::restore()
+
+remotes::install_github("carmonalab/scGate")
+remotes::install_github("carmonalab/ProjecTILs")
+
+library(ProjecTILs)
+library(Seurat)
+```
+
+# Load reference atlas and query data
+
+First, load the Human CD8 TILs reference atlas.
+
+```{r}
+ref <- load.reference.map(ref = 'https://www.dropbox.com/s/phqmqlp30xgnlwn/Human_CD8_TILs_atlas.rds?dl=0')
+```
+
+Let's explore the reference atlas
+
+```{r fig.height=4, fig.width=6}
+refCols <- c('Naive' = '#b7d2e0', 'CM' = '#da6f6f','EM'= '#72b28a','TEMRA' = '#e5bfaf', 'TRM' = '#f3a166', 'TPEX' = '#aca6e0' , 'TEX' ='#f5d39f', "MAIT" = '#fdbfd4')
+DimPlot(ref,label = T, cols = refCols)
+```
+
+See expression of important marker genes across reference subtypes
+
+```{r fig.height=5, fig.width=7}
+markers <- c('LEF1', "TCF7", "CCR7", "GZMK", "FGFBP2",'FCGR3A','ZNF683','ITGAE', "CRTAM", "CD200",'GNG4', "HAVCR2", "TOX", "ENTPD1", 'SLC4A10','TRAV1-2')
+VlnPlot(ref,features=markers,stack = T,flip = T, assay = "RNA")
+```
+
+Now let's load a query dataset - Sade Feldman et al. 2018. These are CD8+ T cells from Melanoma patients, treated or not with Immune checkpoint blockade.
+
+```{r warning=FALSE}
+query <- load.reference.map(ref = 'https://www.dropbox.com/s/b1ou4487aorlitj/SadeFeldman.example.rds?dl=0')
+```
+
+# Projection mode 1: aligning embeddings
+
+The main function in ProjecTILs is `Run.ProjecTILs`, which takes as input a reference map and query dataset. The query will be batch-corrected and projected into the reference map, with low-dimensional embeddings (PCA and UMAP) compatible with those of the reference.
+
+```{r warning=FALSE,message=FALSE}
+query.projected <- Run.ProjecTILs(query, ref = ref, filter.cell = TRUE, skip.normalize = T, split.by = 'Sample')
+```
+
+## Visualize projection
+
+Plot projection of new data over the reference in UMAP space. The contour lines display the density of projected query cells onto the reference map.
+
+```{r fig.height=4, fig.width=6}
+plot.projection(ref, query.projected, linesize = 0.5, pointsize = 0.5)
+```
+
+Plot the predicted composition of the query in terms of reference T cell subtypes
+
+```{r fig.height=3, fig.width=5}
+plot.statepred.composition(ref, query.projected,metric = "Percent", cols = refCols)
+```
+
+How do the gene expression levels compare between reference and query for the different cell states?
+
+```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
+plot.states.radar(ref, query=query.projected, genes4radar = markers)
+```
+
+## Compare cell states across conditions
+
+If we have multiple conditions (e.g. control vs. treatment, or samples from different tissues), we can search for discriminant genes between conditions (otherwise, by default this analysis is performed using the reference as the 'control')
+
+Let's start by plotting proportions between Responders and Non-responders to ICB.
+
+```{r fig.height=8, fig.width=12}
+# Splitting the Seurat object by response to ICB
+query.list <- SplitObject(query.projected, split.by = "Response")
+pll[[1]] <- plot.projection(ref, cols = cols, query.list[["Responder"]]) + ggtitle("Responder")
+pll[[2]] <- plot.statepred.composition(ref, query.list[["Responder"]], cols = cols, metric = "Percent") +
+    ggtitle("Responder") + ylim(0, 52)+ theme_bw()+ RotatedAxis()
+pll[[3]] <- plot.projection(ref, cols = cols, query.list[["Non-responder"]]) + ggtitle("Non-responder")
+pll[[4]] <- plot.statepred.composition(ref, cols = cols, query.list[["Non-responder"]], metric = "Percent") +
+    ggtitle("Non-responder") + ylim(0, 52) + theme_bw() + RotatedAxis()
+grid.arrange(grobs = pll, ncol = 2, nrow = 2, widths = c(1.5, 1))
+```
+
+We can see that non-responders are enriched in TEX
+
+We can also check for gene expression changes between conditions.
+
+```{pll <- list()}
+plot.states.radar(ref, query = query.list, min.cells = 5, genes4radar = c('LEF1', "TCF7", "CCR7", "GZMK", "FGFBP2",'FCGR3A','ZNF683','ITGAE', "CRTAM", "CD200",'GNG4', "HAVCR2", "TOX", "ENTPD1", 'SLC4A10','TRAV1-2')) 
+```
+
+# Projection mode 2: classifier
+
+If you **do not wish to embed your query data into the reference space,** you may also simply use ProjecTILs as a cell type classifier. This may be useful to annotate cell types in your query without altering existing embeddings. This mode is quicker than mode 1.
+
+See the query dataset in unsupervised low-dim embeddings:
+
+```{r fig.height=3.5, fig.width=7}
+querydata <- querydata |> FindVariableFeatures(nfeatures=500) |>
+  ScaleData() |> RunPCA(npcs=10) |> RunUMAP(dims=1:10)
+
+DimPlot(querydata)
+```
+
+The `ProjecTILs.classifier` function applies reference-projection but does not alter the current embeddings.
+
+```{r fig.height=3.5, fig.width=7}
+querydata <- ProjecTILs.classifier(query=query, ref=ref)
+DimPlot(querydata, group.by="functional.cluster", cols = refCols)
+```
+
+As compared to mode 1, **this will keep all your cells. They will just be assigned the NA label**, as they cannot be confidently projected into the reference.
+
+# Further reading
+
+For applications of ProjecTILs to gain biological insight on several public datasets please see the **ProjecTILs case studies** - [INDEX](https://carmonalab.github.io/ProjecTILs_CaseStudies/) - [Repository](https://github.com/carmonalab/ProjecTILs_CaseStudies)
+
+To generate your own reference map for ProjecTILs see [Custom reference map tutorial](https://carmonalab.github.io/ProjecTILs.demo/build_ref_atlas.html)
+
+Publication: [Andreatta et al Nat. Comm. 2021](http://dx.doi.org/10.1038/s41467-021-23324-4)
+
+ProjecTILs [repository](https://github.com/carmonalab/ProjecTILs)
