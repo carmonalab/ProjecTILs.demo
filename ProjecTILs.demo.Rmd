@@ -119,11 +119,15 @@ Plot the predicted composition of the query in terms of reference T cell subtype
 plot.statepred.composition(ref, query.projected,metric = "Percent")
 ```
 
+# Compare gene expression
+
 How do the gene expression levels compare between reference and query for the different cell states?
 
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
 plot.states.radar(ref, query=query.projected)
 ```
+
+# Compare gene programs
 
 We may want to compare query and reference for gene programs, rather than individual genes. For example, we can use signatures stored in the [SignatuR](https://github.com/carmonalab/SignatuR) database and calculate average signature scores per subtype.
 
