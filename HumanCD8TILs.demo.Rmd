@@ -151,7 +151,7 @@ If you **do not wish to embed your query data into the reference space,** you ma
 
 See the query dataset in unsupervised low-dim embeddings:
 
-```{r fig.height=3.5, fig.width=4}
+```{r fig.height=4, fig.width=4}
 query <- query |> FindVariableFeatures(nfeatures=500) |>
   ScaleData() |> RunPCA(npcs=10) |> RunUMAP(dims=1:10)
 
@@ -160,7 +160,7 @@ DimPlot(query, group.by = 'cellSubType', label = T, repel = T) + NoLegend()
 
 The `ProjecTILs.classifier` function applies reference-projection but does not alter the current embeddings.
 
-```{r fig.height=3.5, fig.width=4}
+```{r fig.height=4, fig.width=5}
 query <- ProjecTILs.classifier(query=query, ref=ref, ncores = 4)
 DimPlot(query, group.by="functional.cluster", cols = refCols)
 ```
