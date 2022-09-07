@@ -4,7 +4,7 @@ This repository hosts basic demos for running [ProjecTILs](https://github.com/ca
 
 ## Currently available demos
 
-* Basic usage of ProjecTILs on human CD8 TILs: [Rmd](https://github.com/carmonalab/ProjecTILs.demo/blob/master/HumanCD8TILs.demo.Rmd) - [HTML]
+* Basic usage of ProjecTILs on human CD8 TILs: [Rmd](https://github.com/carmonalab/ProjecTILs.demo/blob/master/HumanCD8TILs.demo.Rmd) - [HTML](https://carmonalab.github.io/ProjecTILs.demo/Human_CD8TILs_tutorial.html)
 
 * Basic usage of ProjecTILs on mouse CD8 TILs: [Rmd](https://github.com/carmonalab/ProjecTILs.demo/blob/master/ProjecTILs.demo.Rmd) - [HTML](https://carmonalab.github.io/ProjecTILs.demo/tutorial.html)
 
