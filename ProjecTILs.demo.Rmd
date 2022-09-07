@@ -120,8 +120,29 @@ plot.statepred.composition(ref, query.projected,metric = "Percent")
 ```
 
 How do the gene expression levels compare between reference and query for the different cell states?
+
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
 plot.states.radar(ref, query=query.projected)
+```
+
+We may want to compare query and reference for gene programs, rather than individual genes. For example, we can use signatures stored in the [SignatuR](https://github.com/carmonalab/SignatuR) database and calculate average signature scores per subtype.
+
+```{r}
+remotes::install_github("carmonalab/SignatuR")
+library(SignatuR)
+
+programs <- GetSignature(SignatuR$Mm$Programs)
+names(programs)
+```
+
+We can obtain per-cell scores using [UCell](https://bioconductor.org/packages/release/bioc/html/UCell.html), and then generate radar plots on average signature scores per subtype:
+
+```{r fig.height=10, fig.width=15, warning=FALSE,message=FALSE}
+library(UCell)
+ref <- AddModuleScore_UCell(ref, features=programs, assay = "RNA", name = NULL)
+query.projected <- AddModuleScore_UCell(query.projected, features=programs, assay = "RNA", name=NULL)
+
+plot.states.radar(ref, query=query.projected, meta4radar = names(programs))
 ```
 
 # Compare cell states across conditions
@@ -175,8 +196,8 @@ The `ProjecTILs.classifier` function applies reference-projection but does not a
 querydata <- ProjecTILs.classifier(query=querydata, ref=ref)
 
 palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D", 
-                "#00B6EB", "#d1cfcc", "#FF0000", "#87f6a5", "#e812dd")
-names(palette) <- levels(ref$functional.cluster)
+                "#00B6EB", "#d1cfcc", "#FF0000", "#87f6a5", "#e812dd", "#777777" )
+names(palette) <- c(levels(ref$functional.cluster), 'NA')
 DimPlot(querydata, group.by="functional.cluster", cols = palette)
 ```
 
