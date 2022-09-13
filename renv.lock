@@ -243,8 +243,8 @@
       "RemoteRepo": "ProjecTILs",
       "RemoteUsername": "carmonalab",
       "RemoteRef": "HEAD",
-      "RemoteSha": "580678b186b197acc289596a1063ce36d3b5ee80",
-      "Hash": "daf16ff8fa3e080b5a916ff8e78db3c7",
+      "RemoteSha": "37e82459b5a865ba9c69d28da4d7c5006f6f05c5",
+      "Hash": "84cfc0ff3f50449a17b0b8dca39136e2",
       "Requirements": [
         "BiocParallel",
         "Matrix",
@@ -493,6 +493,21 @@
         "rgeos",
         "rlang",
         "sp"
+      ]
+    },
+    "SignatuR": {
+      "Package": "SignatuR",
+      "Version": "0.1.1",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "SignatuR",
+      "RemoteUsername": "carmonalab",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "b1050ae32a600b986f14db236f8d45756aaee05b",
+      "Hash": "25f27c4ec63d8e456a2d76f38763f2aa",
+      "Requirements": [
+        "data.tree"
       ]
     },
     "SingleCellExperiment": {
@@ -778,6 +793,17 @@
       "Repository": "CRAN",
       "Hash": "36b67b5adf57b292923f5659f5f0c853",
       "Requirements": []
+    },
+    "data.tree": {
+      "Package": "data.tree",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c0ddced80c3f074cb39a7a781698f68a",
+      "Requirements": [
+        "R6",
+        "stringi"
+      ]
     },
     "deldir": {
       "Package": "deldir",

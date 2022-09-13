@@ -156,7 +156,7 @@ DimPlot(ref.momac, label=T, repel = T, label.size = 4) +
   theme(aspect.ratio = 1) + NoLegend()
 ```
 
-If you really do not want to alter the UMAP space of your reference, you may choose to let `recalculate.umap=FALSE`. In this case, the original UMAP embeddings are preserved, but the reference won't have a predictive UMAP model. When new data are projected into this reference, an approximate algorithm based on nearest neighbors in PCA space is used instead of `uwot::umap_transform` for UMAP embedding. This only affects UMAP embeddings - reference-based cell type label classification is normally performed in PCA space and will give identical results regardless of the status of `recalculate.umap`.
+If you really do not want to alter the UMAP space of your reference, you may choose to let `recalculate.umap=FALSE`. In this case, the original UMAP embeddings are preserved, but the reference won't have a predictive UMAP model. When new data are projected into this reference, an approximate algorithm based on nearest neighbors in PCA space is used instead of `umap::predict.umap` for UMAP embedding. This only affects UMAP embeddings - reference-based cell type label classification is normally performed in PCA space and will give identical results regardless of the status of `recalculate.umap`.
 
 Prepare a reference without altering UMAP embeddings.
 ```{r}
@@ -178,8 +178,8 @@ query.projected <- Run.ProjecTILs(query, ref=ref.momac, filter.cell=F, skip.norm
 
 See the projection results
 ```{r fig.height=4, fig.width=12}
-a <- plot.projection(ref=ref.momac, query=query.projected) + 
-  ggtitle("DC3 re-projected")
+a <- plot.projection(ref=ref.momac, query=query.projected, linesize = 0.5) + 
+  NoLegend() + ggtitle("DC3 re-projected")
 b <- plot.statepred.composition(ref.momac, query.projected)
 a | b
 ```
@@ -206,8 +206,8 @@ ref.momac@misc$atlas.palette <- palette
 ```
 
 ```{r fig.height=4, fig.width=12}
-a <- plot.projection(ref=ref.momac, query=query.projected) + 
-  ggtitle("DC3 re-projected")
+a <- plot.projection(ref=ref.momac, query=query.projected, linesize = 0.5) + 
+  NoLegend() + ggtitle("DC3 re-projected")
 b <- plot.statepred.composition(ref.momac, query.projected)
 a | b
 ```
