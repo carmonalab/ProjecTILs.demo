@@ -124,7 +124,7 @@ plot.statepred.composition(ref, query.projected,metric = "Percent")
 How do the gene expression levels compare between reference and query for the different cell states?
 
 ```{r fig.height=8, fig.width=12, warning=FALSE,message=FALSE}
-plot.states.radar(ref, query=query.projected)
+plot.states.radar(ref, query=query.projected, min.cells=30)
 ```
 
 # Compare gene programs
@@ -177,7 +177,11 @@ EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_l
 Using a random subsetting, p-values should not be significant:
 ```{r fig.height=5, fig.width=6}
 rand.list <- ProjecTILs:::randomSplit(query.projected, n=2, seed=1)
-discriminantGenes <- find.discriminant.genes(ref=ref, query=rand.list[[1]], query.control=rand.list[[2]], state="CD8_Tex")
+discriminantGenes <- find.discriminant.genes(ref=ref,
+                                             query=rand.list[[1]],
+                                             query.control=rand.list[[2]],
+                                             logfc.threshold = 0.01,
+                                             state="CD8_Tex")
 EnhancedVolcano(discriminantGenes, lab = rownames(discriminantGenes), x = "avg_log2FC", y = "p_val", pCutoff = 1e-09, 
     FCcutoff = 0.5, labSize = 5, legendPosition = "none", drawConnectors = F, title = "Random split (Tex)")
 ```
