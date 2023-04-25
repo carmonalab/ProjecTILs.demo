@@ -51,6 +51,7 @@ if (!requireNamespace("renv"))
 library(renv)
 renv::restore()
 
+remotes::install_github("carmonalab/STACAS")
 remotes::install_github("carmonalab/ProjecTILs")
 
 library(ProjecTILs)
