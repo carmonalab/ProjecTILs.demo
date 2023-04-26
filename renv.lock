@@ -3,13 +3,33 @@
     "Version": "4.2.0",
     "Repositories": [
       {
+        "Name": "BioCsoft",
+        "URL": "https://bioconductor.org/packages/3.16/bioc"
+      },
+      {
+        "Name": "BioCann",
+        "URL": "https://bioconductor.org/packages/3.16/data/annotation"
+      },
+      {
+        "Name": "BioCexp",
+        "URL": "https://bioconductor.org/packages/3.16/data/experiment"
+      },
+      {
+        "Name": "BioCworkflows",
+        "URL": "https://bioconductor.org/packages/3.16/workflows"
+      },
+      {
+        "Name": "BioCbooks",
+        "URL": "https://bioconductor.org/packages/3.16/books"
+      },
+      {
         "Name": "CRAN",
         "URL": "https://cran.rstudio.com"
       }
     ]
   },
   "Bioconductor": {
-    "Version": "3.15"
+    "Version": "3.16"
   },
   "Packages": {
     "BH": {
@@ -270,7 +290,7 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-58.3",
+      "Version": "7.3-59",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -281,7 +301,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "9586b552d57f5516fe4d25398c1bacd6"
+      "Hash": "26570ae748e78cb2b0f56019dd2ba354"
     },
     "Matrix": {
       "Package": "Matrix",
@@ -322,7 +342,7 @@
       "RemoteRepo": "ProjecTILs",
       "RemoteUsername": "carmonalab",
       "RemoteRef": "HEAD",
-      "RemoteSha": "ade962d1a4fd3c1df41925b38d45a85d88d683c0",
+      "RemoteSha": "dc261493fdbe70875939094a294ec11377726877",
       "Requirements": [
         "BiocParallel",
         "Matrix",
@@ -343,7 +363,7 @@
         "umap",
         "uwot"
       ],
-      "Hash": "2f1802a667c12e72e43e6ab57ad247fb"
+      "Hash": "ad8b9726de0c111db0a1934fe6320792"
     },
     "R.methodsS3": {
       "Package": "R.methodsS3",
@@ -568,7 +588,7 @@
       "RemoteHost": "api.github.com",
       "RemoteRepo": "STACAS",
       "RemoteUsername": "carmonalab",
-      "RemoteRef": "dev",
+      "RemoteRef": "HEAD",
       "RemoteSha": "5724aa2567cda1b62a610cd6eb989f86061037b7",
       "Requirements": [
         "R",
@@ -578,7 +598,7 @@
         "ggridges",
         "pbapply"
       ],
-      "Hash": "007ece8769c86c45ceda946d557e0ece"
+      "Hash": "4a9dd0ac48a1d02cf1585f96053729e7"
     },
     "Seurat": {
       "Package": "Seurat",
@@ -1158,7 +1178,7 @@
     },
     "fitdistrplus": {
       "Package": "fitdistrplus",
-      "Version": "1.1-8",
+      "Version": "1.1-11",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1169,7 +1189,7 @@
         "stats",
         "survival"
       ],
-      "Hash": "9de7bf56c16871adf44dc88a24c7836c"
+      "Hash": "f40ef9686e85681a1ccbf33d9236aeb9"
     },
     "fontawesome": {
       "Package": "fontawesome",
@@ -1195,14 +1215,14 @@
     },
     "fs": {
       "Package": "fs",
-      "Version": "1.6.1",
+      "Version": "1.6.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "methods"
       ],
-      "Hash": "f4dcd23b67e33d851d2079f703e8b985"
+      "Hash": "94af08e0aa9675a16fadbb3aaaa90d2a"
     },
     "futile.logger": {
       "Package": "futile.logger",
@@ -2213,13 +2233,8 @@
     "scGate": {
       "Package": "scGate",
       "Version": "1.4.1",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "scGate",
-      "RemoteUsername": "carmonalab",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "c110b07bec34f23f24bf97911b6ce2ad1a2020f6",
+      "Source": "Repository",
+      "Repository": "CRAN",
       "Requirements": [
         "BiocParallel",
         "R",
@@ -2234,7 +2249,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "5a667e0880d7e2477b51f5c0cfee9ff7"
+      "Hash": "bdc6545cdbcbf142c54e6157aceba219"
     },
     "scales": {
       "Package": "scales",
