@@ -73,9 +73,11 @@ DimPlot(ref,label = T, cols = refCols)
 ```
 
 See expression of important marker genes across reference subtypes
-```{r fig.height=5, fig.width=7}
-markers <- c("Cd4","Cd8a","Ccr7","Tcf7","Pdcd1","Havcr2","Tox","Izumo1r","Cxcr6","Xcl1","Gzmb","Gzmk","Ifng","Foxp3")
-VlnPlot(ref,features=markers,stack = T,flip = T,assay = "RNA")
+```{r fig.height=6, fig.width=4}
+markers <- c("Cd4","Cd8a","Ccr7","Tcf7","Pdcd1","Havcr2",
+             "Tox","Izumo1r","Cxcr6","Xcl1","Gzmb","Gzmk","Ifng","Foxp3")
+VlnPlot(ref,features=markers,stack = T, flip = T, fill.by = "ident",
+        cols = refCols, assay = "RNA") + NoLegend()
 ```
 
 
@@ -127,7 +129,7 @@ How do the gene expression levels compare between reference and query for the di
 genes4radar = c("Foxp3","Cd4","Cd8a","Tcf7","Ccr7","Sell",
                 "Gzmb","Gzmk","Pdcd1","Havcr2", "Tox", "Mki67")
 
-plot.states.radar(ref, query=query.projected, genes4radar = genes4radar, min.cells=5)
+plot.states.radar(ref, query=query.projected, genes4radar = genes4radar, min.cells=20)
 ```
 
 # Compare gene programs
@@ -211,6 +213,7 @@ palette <- c("#edbe2a", "#A58AFF", "#53B400", "#F8766D",
 names(palette) <- c(levels(ref$functional.cluster), 'NA')
 DimPlot(querydata, group.by="functional.cluster", cols = palette)
 ```
+
 
 We can confirm that most of the cells were classified as CD8_Tex. Please note that filtered cells (i.e. those that were removed by the scGate filter) are assigned the NA label, as they correspond to cell types that are not present in the reference.
 
