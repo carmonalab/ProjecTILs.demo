@@ -106,7 +106,7 @@ rownames(exp.mat) <- meta$Barcode_library
 
 data.Mm <- CreateSeuratObject(t(exp.mat), project="Zilionis_Mm", meta.data = meta)  
 ## NB: data are already normalized, no counts available
-data.Mm@assays$RNA@data <- data.Mm@assays$RNA@counts
+data.Mm <- SetAssayData(data.Mm, layer="data", new.data = GetAssayData(data.Mm, layer="counts"))
 
 #Subset on tumour MoMacDCs for this demo
 mo.mac <- subset(data.Mm, subset=Major.cell.type %in% c("MoMacDC","pDC"))
@@ -148,7 +148,7 @@ We are now ready to convert the dataset into a ProjecTILs reference. The `make.r
 
 * If your object is the result of data integration, rembember to set `assay="integrated"` or set the default assay to integrated prior to running `make.reference`
 
-```{r}
+```{r Build ref}
 ref.momac <- make.reference(ref=mo.mac, ndim=ndim, seed=seed,
                             recalculate.umap = TRUE,
                             annotation.column = "Minor.subset")
@@ -159,7 +159,7 @@ DimPlot(ref.momac, label=T, repel = T, label.size = 4) +
 If you really do not want to alter the UMAP space of your reference, you may choose to let `recalculate.umap=FALSE`. In this case, the original UMAP embeddings are preserved, but the reference won't have a predictive UMAP model. When new data are projected into this reference, an approximate algorithm based on nearest neighbors in PCA space is used instead of `umap::predict.umap` for UMAP embedding. This only affects UMAP embeddings - reference-based cell type label classification is normally performed in PCA space and will give identical results regardless of the status of `recalculate.umap`.
 
 Prepare a reference without altering UMAP embeddings.
-```{r}
+```{r Build ref 2}
 ref.B <- make.reference(ref=mo.mac, ndim=ndim, seed=seed,
                             recalculate.umap = FALSE,
                             annotation.column = "Minor.subset")
@@ -170,7 +170,7 @@ DimPlot(ref.B, label=T, repel = T, label.size = 4) + theme(aspect.ratio = 1)
 
 That's it! you can already use the dataset as a reference to project new data. We may test it by making a dummy dataset using one of the dataset subtypes, e.g. the DC3 cells.
 
-```{r}
+```{r Test reference, message=F, warning=F, cache=F, results=F}
 query <- subset(mo.mac, subset=Minor.subset=="DC3")
 
 query.projected <- Run.ProjecTILs(query, ref=ref.momac, filter.cell=F, skip.normalize=T)
@@ -230,7 +230,7 @@ ref.momac@misc$scGate$human <- gate.human
 ```
 
 Run projection algorithm with automated gating model
-```{r}
+```{r message=F, warning=F, cache=F, results=F}
 query <- subset(mo.mac, subset=Minor.subset=="DC3")
 
 query.projected <- Run.ProjecTILs(query, ref=ref.momac,

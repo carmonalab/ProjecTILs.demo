@@ -44,7 +44,7 @@ First, check package dependencies and install ProjecTILs
 
 ```{r message=F, warning=F}
 Sys.setenv(R_REMOTES_NO_ERRORS_FROM_WARNINGS="true")
-options(timeout = max(300, getOption("timeout")))
+options(timeout=3000)
 
 if (!requireNamespace("renv")) 
   install.packages("renv")
