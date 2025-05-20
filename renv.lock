@@ -863,15 +863,14 @@
       "Encoding": "UTF-8",
       "LazyData": "true",
       "RoxygenNote": "7.3.2",
+      "Author": "Massimo Andreatta [aut, cre] (ORCID: <https://orcid.org/0000-0002-8036-2647>), Paul Gueguen [aut] (ORCID: <https://orcid.org/0000-0003-2930-6073>), Josep Garnica [aut] (ORCID: <https://orcid.org/0000-0001-9493-1321>), Santiago Carmona [aut] (ORCID: <https://orcid.org/0000-0002-2495-0671>)",
+      "Maintainer": "Massimo Andreatta <massimo.andreatta@unil.ch>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "ProjecTILs",
       "RemoteUsername": "carmonalab",
       "RemoteRef": "HEAD",
-      "RemoteSha": "857104ca234d60ad1fe157004ee49d3146cd8891",
-      "NeedsCompilation": "no",
-      "Author": "Massimo Andreatta [aut, cre] (ORCID: <https://orcid.org/0000-0002-8036-2647>), Paul Gueguen [aut] (ORCID: <https://orcid.org/0000-0003-2930-6073>), Josep Garnica [aut] (ORCID: <https://orcid.org/0000-0001-9493-1321>), Santiago Carmona [aut] (ORCID: <https://orcid.org/0000-0002-2495-0671>)",
-      "Maintainer": "Massimo Andreatta <massimo.andreatta@unil.ch>"
+      "RemoteSha": "857104ca234d60ad1fe157004ee49d3146cd8891"
     },
     "R.methodsS3": {
       "Package": "R.methodsS3",
@@ -896,8 +895,7 @@
       "URL": "https://github.com/HenrikBengtsson/R.methodsS3",
       "BugReports": "https://github.com/HenrikBengtsson/R.methodsS3/issues",
       "NeedsCompilation": "no",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "R.oo": {
       "Package": "R.oo",
@@ -955,8 +953,7 @@
       "URL": "https://henrikbengtsson.github.io/R.utils/, https://github.com/HenrikBengtsson/R.utils",
       "BugReports": "https://github.com/HenrikBengtsson/R.utils/issues",
       "NeedsCompilation": "no",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "R6": {
       "Package": "R6",
@@ -1338,7 +1335,7 @@
     },
     "S4Arrays": {
       "Package": "S4Arrays",
-      "Version": "1.7.2",
+      "Version": "1.8.0",
       "Source": "Bioconductor",
       "Title": "Foundation of array-like containers in Bioconductor",
       "Description": "The S4Arrays package defines the Array virtual class to be extended by other S4 classes that wish to implement a container with an array-like semantic. It also provides: (1) low-level functionality meant to help the developer of such container to implement basic operations like display, subsetting, or coercion of their array-like objects to an ordinary matrix or array, and (2) a framework that facilitates block processing of array-like objects (typically on-disk objects).",
@@ -1368,17 +1365,18 @@
         "BiocParallel",
         "SparseArray (>= 0.0.4)",
         "DelayedArray",
+        "HDF5Array",
         "testthat",
         "knitr",
         "rmarkdown",
         "BiocStyle"
       ],
       "VignetteBuilder": "knitr",
-      "Collate": "utils.R rowsum.R abind.R aperm2.R array_selection.R Nindex-utils.R Array-class.R dim-tuning-utils.R Array-subsetting.R Array-subassignment.R ArrayGrid-class.R mapToGrid.R extract_array.R type.R is_sparse.R read_block.R write_block.R show-utils.R zzz.R",
+      "Collate": "utils.R rowsum.R abind.R aperm2.R array_selection.R Nindex-utils.R arep.R array_recycling.R Array-class.R dim-tuning-utils.R Array-subsetting.R Array-subassignment.R ArrayGrid-class.R mapToGrid.R extract_array.R type.R is_sparse.R read_block.R write_block.R show-utils.R Array-kronecker-methods.R zzz.R",
       "git_url": "https://git.bioconductor.org/packages/S4Arrays",
-      "git_branch": "devel",
-      "git_last_commit": "bf25e5f",
-      "git_last_commit_date": "2025-01-14",
+      "git_branch": "RELEASE_3_21",
+      "git_last_commit": "9f3b480",
+      "git_last_commit_date": "2025-04-15",
       "Repository": "Bioconductor 3.21",
       "NeedsCompilation": "yes",
       "Author": "Hervé Pagès [aut, cre] (ORCID: <https://orcid.org/0009-0002-8272-4522>), Jacques Serizay [ctb]",
@@ -1457,15 +1455,14 @@
       "Encoding": "UTF-8",
       "LazyData": "false",
       "RoxygenNote": "7.3.1",
+      "Author": "Massimo Andreatta [aut, cre] (ORCID: <https://orcid.org/0000-0002-8036-2647>), Ariel Berenstein [aut] (ORCID: <https://orcid.org/0000-0001-8540-5389>), Santiago Carmona [aut] (ORCID: <https://orcid.org/0000-0002-2495-0671>)",
+      "Maintainer": "Massimo Andreatta <massimo.andreatta@unil.ch>",
       "RemoteType": "github",
       "RemoteHost": "api.github.com",
       "RemoteRepo": "STACAS",
       "RemoteUsername": "carmonalab",
       "RemoteRef": "HEAD",
-      "RemoteSha": "9532d0a3553868b177cdd2b88206225cbc9f6fa1",
-      "NeedsCompilation": "no",
-      "Author": "Massimo Andreatta [aut, cre] (ORCID: <https://orcid.org/0000-0002-8036-2647>), Ariel Berenstein [aut] (ORCID: <https://orcid.org/0000-0001-8540-5389>), Santiago Carmona [aut] (ORCID: <https://orcid.org/0000-0002-2495-0671>)",
-      "Maintainer": "Massimo Andreatta <massimo.andreatta@unil.ch>"
+      "RemoteSha": "9532d0a3553868b177cdd2b88206225cbc9f6fa1"
     },
     "Seurat": {
       "Package": "Seurat",
@@ -1911,8 +1908,7 @@
       "NeedsCompilation": "yes",
       "Author": "CRAN Team [ctb, cre] (de facto maintainer since 2013), Duncan Temple Lang [aut] (<https://orcid.org/0000-0003-0159-1546>), Tomas Kalibera [ctb]",
       "Maintainer": "CRAN Team <CRAN@r-project.org>",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "XVector": {
       "Package": "XVector",
@@ -1978,7 +1974,8 @@
       "License": "MIT + file LICENSE",
       "NeedsCompilation": "no",
       "Author": "Tony Plate [aut, cre], Richard Heiberger [aut]",
-      "Repository": "CRAN"
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
     },
     "askpass": {
       "Package": "askpass",
@@ -4960,8 +4957,7 @@
       "LazyLoad": "yes",
       "RoxygenNote": "6.0.1",
       "NeedsCompilation": "no",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "pillar": {
       "Package": "pillar",
@@ -6169,8 +6165,7 @@
       "NeedsCompilation": "no",
       "Author": "Simon Potter [aut, trl, cre], Simon Sapin [aut], Ian Bicking [aut]",
       "Maintainer": "Simon Potter <simon@sjp.co.nz>",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "shiny": {
       "Package": "shiny",
@@ -6662,8 +6657,7 @@
       "Description": "A collection of algorithms and functions to aid statistical modeling. Includes limiting dilution analysis (aka ELDA), growth curve comparisons, mixed linear models, heteroscedastic regression, inverse-Gaussian probability calculations, Gauss quadrature and a secure convergence algorithm for nonlinear models. Also includes advanced generalized linear model functions including Tweedie and Digamma distributional families, secure convergence and exact distributional calculations for unit deviances.",
       "License": "GPL-2 | GPL-3",
       "NeedsCompilation": "yes",
-      "Repository": "RSPM",
-      "Encoding": "UTF-8"
+      "Repository": "CRAN"
     },
     "stringi": {
       "Package": "stringi",
