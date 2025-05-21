@@ -60,7 +60,7 @@ library(Seurat)
 
 # Load reference atlas and query data
 
-First, load a mouse reference TIL atlas. Several reference maps are available [from GitHub](https://github.com/carmonalab/ProjecTILs) pr from the [SPICA website](https://spica.unil.ch/refs).
+First, load a mouse reference TIL atlas. Several reference maps are available [from GitHub](https://github.com/carmonalab/ProjecTILs) or from the [SPICA website](https://spica.unil.ch/refs).
 If no reference map file is provided, the function `load.reference.map()` will automatically download it from  [https://doi.org/10.6084/m9.figshare.12478571](https://doi.org/10.6084/m9.figshare.12478571)
 ```{r}
 ref <- load.reference.map()
